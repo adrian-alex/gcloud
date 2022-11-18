@@ -54,10 +54,7 @@ class Key<T> {
 
   @override
   bool operator ==(Object other) {
-    return other is Key &&
-        _parent == other._parent &&
-        type == other.type &&
-        id == other.id;
+    return other is Key && _parent == other._parent && type == other.type && id == other.id;
   }
 
   @override
@@ -104,28 +101,4 @@ abstract class Model<T> {
   Key? parentKey;
 
   Key<T> get key => parentKey!.append(runtimeType, id: id);
-}
-
-/// Superclass for all expanded model classes.
-///
-/// The [ExpandoModel] class adds support for having dynamic properties. You can
-/// set arbitrary fields on these models. The expanded values must be values
-/// accepted by the [RawDatastore] implementation.
-abstract class ExpandoModel<T> extends Model<T> {
-  final Map<String, Object?> additionalProperties = {};
-
-  @override
-  Object? noSuchMethod(Invocation invocation) {
-    var name = mirrors.MirrorSystem.getName(invocation.memberName);
-    if (name.endsWith('=')) name = name.substring(0, name.length - 1);
-    if (invocation.isGetter) {
-      return additionalProperties[name];
-    } else if (invocation.isSetter) {
-      var value = invocation.positionalArguments[0];
-      additionalProperties[name] = value;
-      return value;
-    } else {
-      throw ArgumentError('Unsupported noSuchMethod call on ExpandoModel');
-    }
-  }
 }
